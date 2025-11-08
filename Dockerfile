@@ -6,7 +6,6 @@ ARG PGHOST
 ARG PGPORT
 ARG PGDATABASE
 ARG PGUSER
-
 ARG USERNAME
 ARG PASSWORD
 ARG ENCRYPTIONKEY
@@ -22,15 +21,16 @@ ENV DB_POSTGRESDB_PASSWORD=$PGPASSWORD
 ENV N8N_BASIC_AUTH_ACTIVE=true
 ENV N8N_BASIC_AUTH_USER=$USERNAME
 ENV N8N_BASIC_AUTH_PASSWORD=$PASSWORD
-
 ENV N8N_USER_ID=root
 
 RUN apk add --update graphicsmagick tzdata
 
 USER root
 
+# Install n8n and then the extra Node modules you need
 RUN apk --update add --virtual build-dependencies python3 build-base && \
     npm_config_user=root npm install --location=global n8n@${N8N_VERSION} && \
+    npm install --no-audit --no-fund -g mammoth word-extractor && \
     apk del build-dependencies
 
 WORKDIR /data
@@ -38,7 +38,3 @@ WORKDIR /data
 EXPOSE $PORT
 
 CMD export N8N_PORT=$PORT && n8n start
-
-
-
-
